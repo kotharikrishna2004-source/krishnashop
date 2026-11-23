@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: html-head('Your Orders')}"></head>
+<body>
+
+<!-- Header -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="py-4">
+    <div class="container" style="max-width: 950px;">
+        <h3 class="fw-bold mb-4">Your Orders</h3>
+
+        <!-- Alerts -->
+        <div th:if="${successMessage != null}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${successMessage}">Success</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- No Orders State -->
+        <div th:if="${orders.isEmpty()}" class="bg-white p-5 rounded-3 shadow-sm border text-center">
+            <i class="bi bi-box-seam fs-1 text-muted mb-3 d-block"></i>
+            <h4 class="fw-bold mb-2">No orders placed yet</h4>
+            <p class="text-muted mb-4">Looking for ideas? Explore our trending products and top deals today.</p>
+            <a th:href="@{/products}" class="btn btn-ks-yellow px-4">Start Shopping</a>
+        </div>
+
+        <!-- Orders List -->
+        <div th:unless="${orders.isEmpty()}">
+            <div th:each="order : ${orders}" class="bg-white rounded-3 shadow-sm border mb-4 overflow-hidden">
+                <!-- Order Header Bar -->
+                <div class="bg-light p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3 text-muted small">
+                    <div class="d-flex flex-wrap gap-4">
+                        <div>
+                            <span class="d-block text-uppercase" style="font-size: 0.72rem;">Order Placed</span>
+                            <strong class="text-dark" th:text="${order.formattedDate}">21 Nov 2026</strong>
+                        </div>
+                        <div>
+                            <span class="d-block text-uppercase" style="font-size: 0.72rem;">Total</span>
+                            <strong class="text-dark" th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}">₹1,499.00</strong>
+                        </div>
+                        <div>
+                            <span class="d-block text-uppercase" style="font-size: 0.72rem;">Ship To</span>
+                            <strong class="text-dark" th:text="${order.recipientName}">Recipient Name</strong>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <span class="d-block text-uppercase" style="font-size: 0.72rem;">Order # <span th:text="${order.orderNumber}">KS-12345</span></span>
+                        <a th:href="@{/orders/{id}(id=${order.id})}" class="fw-bold text-decoration-none">View Order Details</a>
+                    </div>
+                </div>
+
+                <!-- Order Body -->
+                <div class="p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="fw-bold mb-0">
+                            Status: 
+                            <span class="badge" th:classappend="'bg-' + ${order.orderStatus.badgeClass}"
+                                  th:text="${order.orderStatus.displayName}">Pending</span>
+                        </h6>
+                        <span class="small text-muted" th:text="'Payment: ' + ${order.paymentMethod} + ' (' + ${order.paymentStatus} + ')'">Cash on Delivery</span>
+                    </div>
+
+                    <!-- Items Preview -->
+                    <div th:each="item : ${order.items}" class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <img th:src="${item.productImage != null ? item.productImage : 'https://placehold.co/80x80?text=Product'}"
+                                 class="rounded" style="width: 55px; height: 55px; object-fit: contain;">
+                            <div>
+                                <div class="fw-bold text-dark" th:text="${item.productName}">Product Title</div>
+                                <small class="text-muted" th:text="'Quantity: ' + ${item.quantity} + ' | Price: ₹' + ${#numbers.formatDecimal(item.price, 0, 'COMMA', 2, 'POINT')}">Qty: 1</small>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <a th:if="${item.product != null}" th:href="@{/product/{id}(id=${item.product.id})}" class="btn btn-outline-secondary btn-sm">
+                                Buy it again
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

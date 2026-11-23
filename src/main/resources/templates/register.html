@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: html-head('Create Account')}"></head>
+<body style="background-color: #ffffff;">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7 col-lg-5">
+            <!-- Brand Logo -->
+            <div class="text-center mb-4">
+                <a th:href="@{/}" class="text-decoration-none">
+                    <h2 class="fw-bold text-dark mb-0">KRISHNA<span class="text-warning">SHOP</span></h2>
+                </a>
+            </div>
+
+            <!-- Registration Card -->
+            <div class="card shadow-sm border p-4 rounded-3">
+                <h3 class="fw-bold mb-3">Create Account</h3>
+
+                <form th:action="@{/register}" th:object="${userDto}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                    <!-- Global Errors -->
+                    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger py-2 px-3 small">
+                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}" class="mb-0"></p>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label fw-bold small mb-1">Your Name</label>
+                        <input type="text" id="fullName" th:field="*{fullName}" class="form-control"
+                               placeholder="First and last name" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                    </div>
+
+                    <!-- Mobile Number -->
+                    <div class="mb-3">
+                        <label for="phone" class="form-label fw-bold small mb-1">Mobile number</label>
+                        <input type="tel" id="phone" th:field="*{phone}" class="form-control"
+                               placeholder="10-digit mobile number" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-bold small mb-1">Email</label>
+                        <input type="email" id="email" th:field="*{email}" class="form-control"
+                               placeholder="name@example.com" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-bold small mb-1">Password</label>
+                        <input type="password" id="password" th:field="*{password}" class="form-control"
+                               placeholder="At least 6 characters" th:errorclass="is-invalid">
+                        <small class="text-muted" style="font-size: 0.75rem;">Passwords must be at least 6 characters.</small>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="form-label fw-bold small mb-1">Re-enter password</label>
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control"
+                               placeholder="Confirm your password" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-ks-yellow w-100 mb-3">Create your Krishna Shop account</button>
+
+                    <div class="small text-muted mb-3">
+                        By creating an account, you agree to Krishna Shop's Conditions of Use and Privacy Notice.
+                    </div>
+                </form>
+
+                <hr class="my-3">
+
+                <div class="small">
+                    Already have an account? <a th:href="@{/login}" class="fw-bold">Sign In <i class="bi bi-caret-right-fill"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

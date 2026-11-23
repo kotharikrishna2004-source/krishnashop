@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: html-head('Order Details')}"></head>
+<body>
+
+<!-- Header -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="py-4">
+    <div class="container" style="max-width: 900px;">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/orders}">Your Orders</a></li>
+                <li class="breadcrumb-item active" th:text="'Order #' + ${order.orderNumber}">Order Details</li>
+            </ol>
+        </nav>
+
+        <!-- Alerts -->
+        <div th:if="${successMessage != null}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${successMessage}">Success</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage != null}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${errorMessage}">Error</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Order Details</h3>
+                <span class="text-muted small">Ordered on <span th:text="${order.formattedDate}">21 Nov 2026</span> | Order # <strong th:text="${order.orderNumber}">KS-12345</strong></span>
+            </div>
+            <!-- Cancel Button if Pending/Confirmed -->
+            <form th:if="${order.orderStatus.name() == 'PENDING' || order.orderStatus.name() == 'CONFIRMED'}"
+                  th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post"
+                  onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-x-circle me-1"></i>Cancel Order
+                </button>
+            </form>
+        </div>
+
+        <!-- Order Summary Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-md-4">
+                <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+                    <h6 class="fw-bold mb-2 text-uppercase small text-muted">Shipping Address</h6>
+                    <div class="fw-bold" th:text="${order.recipientName}">Recipient</div>
+                    <div class="text-muted small" th:text="${order.deliveryAddress}">Address</div>
+                    <div class="text-muted small" th:text="'Phone: ' + ${order.phoneNumber}">Phone</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+                    <h6 class="fw-bold mb-2 text-uppercase small text-muted">Payment Method</h6>
+                    <div class="fw-bold" th:text="${order.paymentMethod}">Cash on Delivery</div>
+                    <div class="small">
+                        Payment Status: <span class="badge bg-secondary" th:text="${order.paymentStatus}">Pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+                    <h6 class="fw-bold mb-2 text-uppercase small text-muted">Order Status</h6>
+                    <div class="fs-5 fw-bold mb-1">
+                        <span class="badge" th:classappend="'bg-' + ${order.orderStatus.badgeClass}"
+                              th:text="${order.orderStatus.displayName}">Pending</span>
+                    </div>
+                    <small class="text-muted" th:if="${order.notes != null && !order.notes.isEmpty()}"
+                           th:text="'Notes: ' + ${order.notes}"></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table Card -->
+        <div class="bg-white p-4 rounded-3 shadow-sm border mb-4">
+            <h5 class="fw-bold mb-3 border-bottom pb-2">Items Ordered</h5>
+
+            <div th:each="item : ${order.items}" class="row align-items-center py-3 border-bottom">
+                <div class="col-2 text-center">
+                    <img th:src="${item.productImage != null ? item.productImage : 'https://placehold.co/100x100?text=Product'}"
+                         class="img-fluid rounded" style="max-height: 70px; object-fit: contain;">
+                </div>
+                <div class="col-6">
+                    <h6 class="fw-bold mb-1" th:text="${item.productName}">Product Title</h6>
+                    <div class="small text-muted" th:text="'Unit Price: ₹' + ${#numbers.formatDecimal(item.price, 0, 'COMMA', 2, 'POINT')} + ' x ' + ${item.quantity}">₹1,499.00 x 1</div>
+                </div>
+                <div class="col-4 text-end">
+                    <div class="fw-bold fs-5 text-dark" th:text="'₹' + ${#numbers.formatDecimal(item.subtotal, 0, 'COMMA', 2, 'POINT')}">₹1,499.00</div>
+                </div>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="row justify-content-end mt-4">
+                <div class="col-12 col-md-5">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Item(s) Subtotal:</span>
+                        <span th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount - order.shippingFee, 0, 'COMMA', 2, 'POINT')}">₹1,499.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Shipping & Handling:</span>
+                        <span th:if="${order.shippingFee == 0}" class="text-success fw-bold">FREE</span>
+                        <span th:unless="${order.shippingFee == 0}" th:text="'₹' + ${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 2, 'POINT')}">₹40.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-baseline mb-2">
+                        <span class="fw-bold fs-5">Grand Total:</span>
+                        <span class="fw-bold fs-4 text-danger" th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}">₹1,499.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a th:href="@{/orders}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to All Orders
+        </a>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

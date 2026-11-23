@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Admin Sidebar -->
+<aside th:fragment="admin-sidebar(activePage)" class="admin-sidebar">
+    <div class="admin-brand">
+        <i class="bi bi-shield-check text-warning fs-3"></i>
+        <div>
+            <div class="fw-bold">KRISHNA SHOP</div>
+            <small class="text-white-50 text-uppercase" style="font-size: 0.7rem;">Admin Console</small>
+        </div>
+    </div>
+    <ul class="admin-nav">
+        <li>
+            <a th:href="@{/admin}" th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/products}" th:classappend="${activePage == 'products'} ? 'active' : ''">
+                <i class="bi bi-box-seam"></i>
+                <span>Products</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/categories}" th:classappend="${activePage == 'categories'} ? 'active' : ''">
+                <i class="bi bi-tags"></i>
+                <span>Categories</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/orders}" th:classappend="${activePage == 'orders'} ? 'active' : ''">
+                <i class="bi bi-cart-check"></i>
+                <span>Customer Orders</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/customers}" th:classappend="${activePage == 'customers'} ? 'active' : ''">
+                <i class="bi bi-people"></i>
+                <span>Registered Users</span>
+            </a>
+        </li>
+        <li class="mt-4 border-top border-secondary pt-3">
+            <a th:href="@{/}" target="_blank">
+                <i class="bi bi-box-arrow-up-right"></i>
+                <span>Visit Storefront</span>
+            </a>
+        </li>
+    </ul>
+    <div class="p-3 border-top border-secondary text-center">
+        <form th:action="@{/logout}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                <i class="bi bi-power me-1"></i>Logout Admin
+            </button>
+        </form>
+    </div>
+</aside>
+
+<!-- Admin Top Header -->
+<header th:fragment="admin-header(title)" class="admin-header">
+    <h4 class="mb-0 fw-bold" th:text="${title}">Admin Dashboard</h4>
+    <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+            <i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i>System Online
+        </span>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i>Admin User
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><a class="dropdown-item" th:href="@{/}"><i class="bi bi-shop me-2"></i>Go to Store</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form th:action="@{/logout}" method="post" class="px-2">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+</body>
+</html>
